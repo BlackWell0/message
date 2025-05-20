@@ -12,7 +12,7 @@ ADMIN_CHAT_ID = 5280481527
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "سلام! این یک ربات پیام ناشناس است. هر پیامی که اینجا بفرستید فقط برای ادمین ارسال خواهد شد."
+        "هر پیامی بدین بهم ارسال میشه"
     )
 
 
@@ -22,14 +22,14 @@ async def setup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     # دکمه شیشه‌ای با لینک به ربات
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ارسال پیام ناشناس",
+        [InlineKeyboardButton("پیامتونو ناشنانس بهم بدین",
                               url=f"https://t.me/{bot_username}")]
     ])
 
     try:
         await context.bot.send_message(
             chat_id=CHANNEL_ID,
-            text="برای ارسال پیام ناشناس روی دکمه زیر کلیک کنید:",
+            text="برای ارسال پیام ناشناس رو دکمه زیر کلیک کنین:",
             reply_markup=keyboard
         )
         await update.message.reply_text("✅ پیام با موفقیت در کانال ارسال شد.")
@@ -51,7 +51,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
 
         await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=hidden_report)
-        await update.message.reply_text("✅ پیام شما به صورت ناشناس برای ادمین ارسال شد!")
+        await update.message.reply_text("✅ پیامتون بصورت ناشناس بهم ارسال شد \n")
 
 
 def main():
