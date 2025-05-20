@@ -1,12 +1,15 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, JobQueue
+import pytz
 
-# جایگزین کنید با توکن ربات خود
+# جایگزین شده با توکن ربات واقعی
 TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
-# شناسه یا نام کاربری کانال (مثال: "@YourChannelUsername" یا -1001234567890)
+# شناسه یا نام کاربری کانال
 CHANNEL_ID = "@im_sadegh"
 # آیدی عددی شما (ادمین) برای دریافت آگاهانه پیام‌های خصوصی
-ADMIN_CHAT_ID = 5280481527  # 👈 این عدد را با آیدی عددی خودتان جایگزین کنید
+ADMIN_CHAT_ID = 5280481527
+# منطقه زمانی برای JobQueue (استفاده از pytz)
+TIMEZONE = "Asia/Tehran"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -58,7 +61,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
 
         # ارسال اطلاعات فرستنده به ادمین بدون اطلاع‌رسانی به کاربر
-        hidden_report = f"📥 پیام جدید ناشناس:\n🆔 آیدی عددی: {user_id}\n👤 نام کامل: {full_name}\n🔗 نام کاربری: @{user_name if user_name != '---' else 'ندارد'}\n📨 متن پیام:\n{user_text}"
+        hidden_report = (
+            f"📥 پیام جدید ناشناس:\n"
+            f"🆔 آیدی عددی: {user_id}\n"
+            f"👤 نام کامل: {full_name}\n"
+            f"🔗 نام کاربری: @{user_name if user_name != '---' else 'ندارد'}\n"
+            f"📨 متن پیام:\n{user_text}"
+        )
 
         await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=hidden_report)
 
@@ -70,7 +79,10 @@ def main() -> None:
     """
     نقطه ورود برنامه
     """
-    app = ApplicationBuilder().token(TOKEN).build()
+    # برای جلوگیری از خطای JobQueue با timezone
+    job_queue = JobQueue(timezone=pytz.timezone(TIMEZONE))
+
+    app = ApplicationBuilder().token(TOKEN).job_queue(job_queue).build()
 
     # ثبت فرمان‌ها و هندلرها
     app.add_handler(CommandHandler("start", start))
