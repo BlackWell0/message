@@ -8,7 +8,7 @@ TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
 CHANNEL_ID = "@im_sadegh"
 # آیدی عددی شما (ادمین) برای دریافت آگاهانه پیام‌های خصوصی
 ADMIN_CHAT_ID = 5280481527
-# منطقه زمانی برای JobQueue (استفاده از pytz)
+# منطقه زمانی صحیح برای اردبیل/ تهران
 TIMEZONE = "Asia/Tehran"
 
 
@@ -79,8 +79,9 @@ def main() -> None:
     """
     نقطه ورود برنامه
     """
-    # برای جلوگیری از خطای JobQueue با timezone
-    job_queue = JobQueue(timezone=pytz.timezone(TIMEZONE))
+    # ایجاد JobQueue و تنظیم timezone برای جلوگیری از ارور
+    job_queue = JobQueue()
+    job_queue.scheduler.configure(timezone=pytz.timezone(TIMEZONE))
 
     app = ApplicationBuilder().token(TOKEN).job_queue(job_queue).build()
 
