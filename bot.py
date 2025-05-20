@@ -1,67 +1,57 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+import logging
 
-# توکن ربات
+# فعال‌سازی لاگ برای دیباگ راحت‌تر
+logging.basicConfig(level=logging.INFO)
+
 TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
-
-# شناسه کانال (به‌صورت @channel_username)
-CHANNEL_ID = "@im_sadegh"
-
-# آیدی عددی ادمین (برای دریافت پیام‌های ناشناس)
+CHANNEL_ID = "@im_sadegh"  # یا عددی اگر کانال خصوصی است
 ADMIN_CHAT_ID = 5280481527
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "سلام! اینجا پیام شما به صورت ناشناس برای ادمین ارسال خواهد شد."
+        "سلام! این یک ربات پیام ناشناس است. هر پیامی که اینجا بفرستید فقط برای ادمین ارسال خواهد شد."
     )
 
 
 async def setup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    ارسال پیام حاوی دکمه شیشه‌ای به کانال برای دریافت پیام ناشناس
-    """
-
-    # گرفتن یوزرنیم ربات برای ساختن لینک به خودش
     bot_info = await context.bot.get_me()
     bot_username = bot_info.username
 
-    keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("ارسال پیام ناشناس",
-                               url=f"https://t.me/{bot_username}")]]
-    )
+    # دکمه شیشه‌ای با لینک به ربات
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("ارسال پیام ناشناس",
+                              url=f"https://t.me/{bot_username}")]
+    ])
 
     try:
-        # ارسال پیام به کانال
         await context.bot.send_message(
             chat_id=CHANNEL_ID,
             text="برای ارسال پیام ناشناس روی دکمه زیر کلیک کنید:",
             reply_markup=keyboard
         )
-        await update.message.reply_text("✅ پیام دارای دکمه به کانال ارسال شد.")
+        await update.message.reply_text("✅ پیام با موفقیت در کانال ارسال شد.")
     except Exception as e:
-        await update.message.reply_text(f"❌ خطا در ارسال به کانال: {e}")
+        await update.message.reply_text(f"❌ ارسال پیام به کانال با خطا مواجه شد: {e}")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    دریافت پیام خصوصی و ارسال آن برای ادمین به‌صورت ناشناس
-    """
     if update.message.chat.type == "private":
         user = update.message.from_user
-        msg = update.message.text
+        message = update.message.text
 
-        # متن ارسالی به ادمین
-        report = (
-            "📥 پیام ناشناس جدید:\n"
-            f"👤 نام: {user.full_name}\n"
-            f"🔗 یوزرنیم: @{user.username or 'ندارد'}\n"
-            f"🆔 آیدی: {user.id}\n"
-            f"📝 متن:\n{msg}"
+        hidden_report = (
+            f"📥 پیام جدید ناشناس:\n"
+            f"🆔 آیدی عددی: {user.id}\n"
+            f"👤 نام کامل: {user.full_name}\n"
+            f"🔗 نام کاربری: @{user.username or 'ندارد'}\n"
+            f"📨 متن پیام:\n{message}"
         )
 
-        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=report)
-        await update.message.reply_text("✅ پیام شما به ادمین ارسال شد.")
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=hidden_report)
+        await update.message.reply_text("✅ پیام شما به صورت ناشناس برای ادمین ارسال شد!")
 
 
 def main():
