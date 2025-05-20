@@ -2,7 +2,6 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from telegram.ext import JobQueue
 
 # جایگزین شده با توکن ربات واقعی
 TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
@@ -72,11 +71,8 @@ def main() -> None:
     """
     نقطه ورود برنامه
     """
-    # ساخت شیء زمان‌بندی با پشتیبانی pytz
-    scheduler = AsyncIOScheduler(timezone=pytz.utc)
-    job_queue = JobQueue(scheduler=scheduler)
-
-    app = ApplicationBuilder().token(TOKEN).job_queue(job_queue).build()
+    # ساخت اپلیکیشن بدون JobQueue اختصاصی (اجتناب از ارور timezone)
+    app = ApplicationBuilder().token(TOKEN).build()
 
     # ثبت فرمان‌ها و هندلرها
     app.add_handler(CommandHandler("start", start))
