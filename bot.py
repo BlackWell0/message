@@ -7,6 +7,7 @@ TOKEN = "7669113616:AAH6qqabVjqVu4X44GFrs68AjN3CaEFPoMg"
 CHANNEL_ID = "@im_sadegh"
 # آیدی عددی خودت برای دریافت پیام‌ها
 ADMIN_CHAT_ID = 5280481527
+x = "a"
 
 
 async def setup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
